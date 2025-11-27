@@ -9,5 +9,6 @@ int main(int argc, char **argv)
     }
 
     BitcoinExchange btc(argv[1]);
+    btc.displayData();
     return 0;
 }

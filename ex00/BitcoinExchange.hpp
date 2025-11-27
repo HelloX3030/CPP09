@@ -2,10 +2,15 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <map>
+#include <stdexcept>
 
 class BitcoinExchange
 {
     private:
+        std::map<std::string, double> data;
+
     public:
         // Canonical Form
         BitcoinExchange();
@@ -15,4 +20,6 @@ class BitcoinExchange
 
         // Special Constructors
         BitcoinExchange(const std::string& filename);
+
+        void displayData() const;
 };
