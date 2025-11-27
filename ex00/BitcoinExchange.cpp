@@ -38,11 +38,12 @@ void BitcoinExchange::load_btc_data(const std::string &filename)
     if (!file)
         throw std::runtime_error("Error: Could not open file " + filename);
 
-    // Validate header
+    // Validate Header
     std::string line;
     if (!std::getline(file, line))
         throw std::runtime_error("Error: File " + filename + " is empty or missing header");
-    line = line.substr(0, line.find_last_not_of(" \n\r\t") + 1);
+    line.erase(0, line.find_first_not_of(" \n\r\t"));
+    line.erase(line.find_last_not_of(" \n\r\t") + 1);
     if (line != "date,exchange_rate")
         throw std::runtime_error("Error: Invalid header in file " + filename + " (expected 'date,exchange_rate') got " + line);
     
@@ -59,7 +60,7 @@ void BitcoinExchange::load_btc_data(const std::string &filename)
         std::string date;
         size_t pos = line.find(',');
         if (pos == std::string::npos)
-            throw std::runtime_error("Error: Invalid line format in file " + filename);
+            throw std::runtime_error("Error: Invalid line format in file " + filename + " (expected 'date|value') got \"" + line + "\"");
         date = line.substr(0, pos);
         std::string value_str = line.substr(pos + 1);
         validate_date(date);
@@ -114,5 +115,32 @@ void BitcoinExchange::displayData() const
 
 void BitcoinExchange::displayUserData(const std::string& filename) const
 {
-    (void)filename;
+    std::ifstream file(filename);
+    if (!file)
+        throw std::runtime_error("Error: Could not open file " + filename);
+    
+    // Validate Header
+    std::string line;
+    if (!std::getline(file, line))
+        throw std::runtime_error("Error: File " + filename + " is empty or missing header");
+    line.erase(0, line.find_first_not_of(" \n\r\t"));
+    line.erase(line.find_last_not_of(" \n\r\t") + 1);
+    size_t pos = line.find('|');
+    if (pos == std::string::npos)
+        throw std::runtime_error("Error: Invalid header format in file " + filename + " (expected 'date|value') got \"" + line + "\"");
+    std::string date_str = line.substr(0, pos);
+    date_str.erase(line.find_last_not_of(" \n\r\t") + 1);
+    if (date_str != "date")
+        throw std::runtime_error("Error: Invalid header format in file " + filename + " (expected 'date|value') got \"" + line + "\"");
+    std::string value_str = line.substr(pos + 1);
+    value_str.erase(0, value_str.find_first_not_of(" \n\r\t"));
+    value_str.erase(value_str.find_last_not_of(" \n\r\t") + 1);
+    if (value_str != "value")
+        throw std::runtime_error("Error: Invalid header format in file " + filename + " (expected 'date|value') got \"" + line + "\"");
+    
+    // Load Values
+    while (std::getline(file, line))
+    {
+        std::cout << line << std::endl;
+    }
 }
