@@ -81,17 +81,12 @@ void BitcoinExchange::load_btc_data(const std::string &filename)
     }
 }
 
-void BitcoinExchange::load_user_data(const std::string &filename)
-{
-    (void)filename;
-}
-
 BitcoinExchange::BitcoinExchange()
 {
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& other)
-    : data(other.data), user_data(other.user_data)
+    : data(other.data)
 {
 }
 
@@ -100,17 +95,15 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange& other)
     if (this != &other)
     {
         data = other.data;
-        user_data = other.user_data;
     }
     return *this;
 }
 
 BitcoinExchange::~BitcoinExchange() {}
 
-BitcoinExchange::BitcoinExchange(const std::string& btc_dat_filename, const std::string& user_data_filename)
+BitcoinExchange::BitcoinExchange(const std::string& btc_dat_filename)
 {
     load_btc_data(btc_dat_filename);
-    load_user_data(user_data_filename);
 }
 
 void BitcoinExchange::displayData() const
@@ -119,8 +112,7 @@ void BitcoinExchange::displayData() const
         std::cout << pair.first << ": " << pair.second << std::endl;
 }
 
-void BitcoinExchange::displayUserData() const
+void BitcoinExchange::displayUserData(const std::string& filename) const
 {
-    for (const auto& pair : user_data)
-        std::cout << pair.first << ": " << pair.second << std::endl;
+    (void)filename;
 }
