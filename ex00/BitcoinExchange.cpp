@@ -86,15 +86,18 @@ BitcoinExchange::BitcoinExchange(const std::string& filename)
 
         // Parse Value
         pos = 0;
+        double value;
         try {
-            double value = std::stod(value_str, &pos);
+            value = std::stod(value_str, &pos);
             if (pos != value_str.size()) {
                 throw std::runtime_error("Invalid characters in value: " + value_str);
             }
-            data[date] = value;
         } catch(const std::exception& e) {
             throw std::runtime_error("Error: Invalid value for date " + date + " value: " + value_str);
         }
+        data[date] = value;
+        if (value < 0)
+            throw std::runtime_error("Error: Negative value for date " + date + " value: " + value_str);
     }
 }
 
