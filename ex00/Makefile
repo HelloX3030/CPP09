@@ -10,10 +10,10 @@ vpath %.hpp include/
 vpath %.cpp src/
 
 # .h and .hpp files
-H_FILES := MutantStack.hpp
+H_FILES := BitcoinExchange.hpp
 
 # .cpp source files
-SRC_FILES := main.cpp
+SRC_FILES := main.cpp BitcoinExchange.cpp
 
 # Object directory and object files
 OBJ_DIR := obj
