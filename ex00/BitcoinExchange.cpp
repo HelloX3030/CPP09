@@ -69,27 +69,30 @@ BitcoinExchange::BitcoinExchange(const std::string& filename)
     // Process data lines
     while (std::getline(file, line))
     {
-        line = line.substr(0, line.find_last_not_of(" \n\r\t") + 1);
+        // Trim
+        line.erase(0, line.find_first_not_of(" \n\r\t"));
+        line.erase(line.find_last_not_of(" \n\r\t") + 1);
         if (line.empty())
             continue;
+        
+        // Extract Date
         std::string date;
         size_t pos = line.find(',');
         if (pos == std::string::npos)
             throw std::runtime_error("Error: Invalid line format in file " + filename);
-        
-        // Extract Date
         date = line.substr(0, pos);
         std::string value_str = line.substr(pos + 1);
         validate_date(date);
 
-        // Extract Value
-        try
-        {
-            double value = std::stod(value_str);
+        // Parse Value
+        pos = 0;
+        try {
+            double value = std::stod(value_str, &pos);
+            if (pos != value_str.size()) {
+                throw std::runtime_error("Invalid characters in value: " + value_str);
+            }
             data[date] = value;
-        }
-        catch(const std::exception& e)
-        {
+        } catch(const std::exception& e) {
             throw std::runtime_error("Error: Invalid value for date " + date + " value: " + value_str);
         }
     }
