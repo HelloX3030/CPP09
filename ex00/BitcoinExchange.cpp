@@ -118,6 +118,11 @@ void BitcoinExchange::displayData() const
         std::cout << pair.first << ": " << pair.second << std::endl;
 }
 
+static void print_price(std::string date, double value, double price)
+{
+    std::cout << date << " => " << value << " = " << price * value << std::endl;
+}
+
 void BitcoinExchange::displayUserData(const std::string& filename) const
 {
     std::ifstream file(filename);
@@ -186,6 +191,18 @@ void BitcoinExchange::displayUserData(const std::string& filename) const
             std::cerr << "Error: Value too large for date " + date_str + " value: " + value_str << std::endl;
             continue;
         }
-        std::cout << date_str << " => " << value << std::endl;
+        
+        // Get total Amount
+        auto it = data.lower_bound(date_str);
+        if (it != data.end() && it->first == date_str) {
+            print_price(date_str, value, it->second);
+        } else {
+            if (it == data.begin()) {
+                std::cerr << "Error: No earlier date in DB for " << date_str << "\n";
+            } else {
+                --it; // step back to the largest date smaller than date_str
+                print_price(date_str, value, it->second);
+            }
+        }
     }
 }
