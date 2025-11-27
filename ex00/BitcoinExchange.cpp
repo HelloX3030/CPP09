@@ -147,6 +147,45 @@ void BitcoinExchange::displayUserData(const std::string& filename) const
     // Load Values
     while (std::getline(file, line))
     {
-        std::cout << line << std::endl;
+        pos = line.find('|');
+        if (pos == std::string::npos) {
+            std::cerr << "Invalid line format in file " << filename << " (expected 'date|value') got \"" << line << "\"" << std::endl;
+            continue;
+        }
+
+        // Parse Date
+        date_str = trim(line.substr(0, pos));
+        try
+        {
+            validate_date(date_str);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << "Invalid Date: " << date_str << " (" << e.what() << ")" << std::endl;
+            continue;
+        }
+        value_str = trim(line.substr(pos + 1));
+
+        // Parse Value
+        double value;
+        try {
+            value = std::stod(value_str, &pos);
+            if (pos != value_str.size()) {
+                std::cerr << "Invalid characters in value: " + value_str << std::endl;
+                continue;
+            }
+        } catch(const std::exception& e) {
+            std::cerr << "Error: Invalid value for date " + date_str + " value: " + value_str << std::endl;
+            continue;
+        }
+        if (value < 0) {
+            std::cerr << "Error: Negative value for date " + date_str + " value: " + value_str << std::endl;
+            continue;
+        }
+        if (value > 1000) {
+            std::cerr << "Error: Value too large for date " + date_str + " value: " + value_str << std::endl;
+            continue;
+        }
+        std::cout << date_str << " => " << value << std::endl;
     }
 }
