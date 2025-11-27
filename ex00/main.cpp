@@ -8,7 +8,14 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    BitcoinExchange btc(argv[1]);
-    btc.displayData();
+    try
+    {
+        BitcoinExchange btc(argv[1]);
+        btc.displayData();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
     return 0;
 }
