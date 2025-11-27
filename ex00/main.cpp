@@ -10,8 +10,8 @@ int main(int argc, char **argv)
 
     try
     {
-        BitcoinExchange btc(argv[1]);
-        btc.displayData();
+        BitcoinExchange btc("data.csv", argv[1]);
+        btc.displayUserData();
     }
     catch(const std::exception& e)
     {
