@@ -1,5 +1,4 @@
 #include "RPN.hpp"
-#include <iostream>
 
 int main(int argc, char **argv)
 {
@@ -10,7 +9,6 @@ int main(int argc, char **argv)
     try
     {
         RPN rpn(argv[1]);
-        std::cout << rpn.to_string() << std::endl;
         std::cout << rpn.calc() << std::endl;
     }
     catch(const std::exception& e)

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <stack>
+#include <iostream>
 
 class RPN
 {
@@ -16,9 +17,8 @@ class RPN
         ~RPN();
 
         // Special Constructor
-        RPN(const char *str);
+        RPN(const std::string &str);
 
         // Functions
-        std::string to_string();
         int calc();
 };
