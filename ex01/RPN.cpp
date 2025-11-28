@@ -7,6 +7,35 @@ static std::string trim(const std::string& s) {
     return s.substr(start, end - start + 1);
 }
 
+static bool is_operator(const std::string &token) {
+    return token == "+" || token == "-" || token == "*" || token == "/";
+}
+
+static int parse_int(const std::string &token) {
+    try {
+        size_t pos;
+        int value = std::stoi(token, &pos);
+        if (pos != token.size()) {
+            throw std::runtime_error("Error: Invalid integer: " + token);
+        }
+        return value;
+    } catch (const std::exception &e) {
+        throw std::runtime_error("Error: Invalid integer: " + token);
+    }
+}
+
+static int apply_operator(int left, int right, const std::string &op) {
+    if (op == "+") return left + right;
+    if (op == "-") return left - right;
+    if (op == "*") return left * right;
+    if (op == "/") {
+        if (right == 0)
+            throw std::runtime_error("Error: Division by zero");
+        return left / right;
+    }
+    throw std::runtime_error("Error: Unknown operator: " + op);
+}
+
 RPN::RPN()
 {
 }
@@ -49,9 +78,25 @@ int RPN::calc()
     while (_stack.size())
     {
         std::string token = _stack.top();
-        std::cout << token << " ";
         _stack.pop();
+        if (is_operator(token)) {
+            if (_stack.size() < 2)
+                throw std::runtime_error("Error: Not enough operands for operator " + token);
+            int right, left;
+            right = parse_int(_stack.top());
+            _stack.pop();
+            left = parse_int(_stack.top());
+            _stack.pop();
+            int result = apply_operator(left, right, token);
+            _stack.push(std::to_string(result));
+        }
+        else {
+            parse_int(token); // Validate integer
+            _stack.push(token);
+        }
     }
-    std::cout << std::endl;
-    return 0;
+    if (_stack.size() != 1) {
+        throw std::runtime_error("Error: Invalid RPN expression");
+    }
+    return parse_int(_stack.top());
 }
