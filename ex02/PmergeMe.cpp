@@ -16,55 +16,61 @@ static int parse_int(const std::string &token) {
     }
 }
 
-template <typename T>
-PmergeMe<T>::PmergeMe() {}
 
-template <typename T>
-PmergeMe<T>::PmergeMe(const PmergeMe& other) {
-    _data = other._data;
-    _sorted = other._sorted;
+PmergeMe::PmergeMe() {}
+
+PmergeMe::PmergeMe(const PmergeMe& other) {
+    _data_vector = other._data_vector;
+    _sorted_vector = other._sorted_vector;
+    _data_list = other._data_list;
+    _sorted_list = other._sorted_list;
 }
 
-template <typename T>
-PmergeMe<T>& PmergeMe<T>::operator=(const PmergeMe& other) {
+PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
     if (this != &other) {
-        _data = other._data;
-        _sorted = other._sorted;
+        _data_vector = other._data_vector;
+        _sorted_vector = other._sorted_vector;
+        _data_list = other._data_list;
+        _sorted_list = other._sorted_list;
     }
     return *this;
 }
 
-template <typename T>
-PmergeMe<T>::~PmergeMe() {}
 
-// Special Constructor
-template <typename T>
-PmergeMe<T>::PmergeMe(int argc, char** argv) {
-    for (int i = 1; i < argc; ++i) {
-        _data.push_back(parse_int(argv[i]));
-    }
-}
+PmergeMe::~PmergeMe() {}
 
 // Functions
-template <typename T>
-void PmergeMe<T>::displayData() const {
-    for (typename T::const_iterator it = _data.begin(); it != _data.end(); ++it) {
+void PmergeMe::displayData() const {
+    auto it = _data_list.begin();
+    for (size_t i = 0; i < _data_vector.size(); ++i) {
+        std::cout << _data_vector[i] << " ";
+        if (it == _data_list.end() || _data_vector[i] != *it)
+            throw std::runtime_error("Error: Data mismatch between vector and list.");
+        ++it;
+    }
+    std::cout << std::endl;
+
+    auto it = _sorted_list.begin();
+    for (size_t i = 0; i < _sorted_vector.size(); ++i) {
+        std::cout << _sorted_vector[i] << " ";
+        if (it == _sorted_list.end() || _sorted_vector[i] != *it)
+            throw std::runtime_error("Error: Sorted data mismatch between vector and list.");
+        ++it;
+    }
+    std::cout << std::endl;
+}
+
+void PmergeMe::displaySorted() const {
+    for (std::vector<int>::const_iterator it = _sorted_vector.begin(); it != _sorted_vector.end(); ++it) {
         std::cout << *it << " ";
     }
     std::cout << std::endl;
 }
 
-template <typename T>
-void PmergeMe<T>::displaySorted() const {
-    for (typename T::const_iterator it = _sorted.begin(); it != _sorted.end(); ++it) {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
+void PmergeMe::sortVector(int argc, char** argv) {
+    std::vector<std::pair<int, int> > pairs;
 }
 
-template <typename T>
-void PmergeMe<T>::sortData() {
+void PmergeMe::sortList(int argc, char** argv) {
+    std::list<std::pair<int, int> > pairs;
 }
-
-template class PmergeMe<std::vector<int> >;
-template class PmergeMe<std::list<int> >;

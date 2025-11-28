@@ -6,11 +6,12 @@
 #include <stdexcept>
 #include <iostream>
 
-template <typename T>
 class PmergeMe {
 private:
-    T _data;
-    T _sorted;
+    std::vector<int> _data_vector;
+    std::vector<int> _sorted_vector;
+    std::list<int> _data_list;
+    std::list<int> _sorted_list;
 
 public:
     // Canonical Form
@@ -19,14 +20,9 @@ public:
     PmergeMe& operator=(const PmergeMe& other);
     ~PmergeMe();
 
-    // Special Constructor
-    PmergeMe(int argc, char** argv);
-
     // Functions
+    void sortVector(int argc, char** argv);
+    void sortList(int argc, char** argv);
     void displayData() const;
     void displaySorted() const;
-    void sortData();
 };
-
-typedef PmergeMe<std::vector<int> > PmergeMeVector;
-typedef PmergeMe<std::list<int> > PmergeMeList;
