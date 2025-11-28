@@ -128,7 +128,7 @@ void BitcoinExchange::displayUserData(const std::string& filename) const
     std::ifstream file(filename);
     if (!file)
         throw std::runtime_error("Error: Could not open file " + filename);
-    
+
     // Validate Header
     std::string untrimmed_line;
     std::string line;
