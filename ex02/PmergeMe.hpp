@@ -9,8 +9,8 @@
 template <typename T>
 class PmergeMe {
 private:
-    T data;
-    T sorted;
+    T _data;
+    T _sorted;
 
 public:
     // Canonical Form
