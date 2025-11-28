@@ -43,12 +43,14 @@ RPN::RPN()
 RPN::RPN(const RPN& other)
 {
     _stack = other._stack;
+    _operands = other._operands;
 }
 
 RPN& RPN::operator=(const RPN& other)
 {
     if (this != &other) {
         _stack = other._stack;
+        _operands = other._operands;
     }
     return *this;
 }
@@ -60,18 +62,18 @@ RPN::~RPN()
 RPN::RPN(const std::string &str)
 {
     std::string input = trim(str);
-    size_t pos = input.find_first_of(" ");
-    while (pos != std::string::npos)
-    {
-        std::string token = input.substr(0, pos);
-        _stack.push(token);
-        input = trim(input.substr(pos + 1));
-        pos = input.find_first_of(" ");
-    }
-    if (!input.empty()) {
-        _stack.push(input);
+
+    while (!input.empty()) {
+        size_t pos = input.find_last_of(' ');
+        if (pos == std::string::npos) {
+            _stack.push(input);
+            break;
+        }
+        _stack.push(input.substr(pos + 1));
+        input = trim(input.substr(0, pos));
     }
 }
+
 
 int RPN::calc()
 {
@@ -80,23 +82,22 @@ int RPN::calc()
         std::string token = _stack.top();
         _stack.pop();
         if (is_operator(token)) {
-            if (_stack.size() < 2)
+            if (_operands.size() < 2)
                 throw std::runtime_error("Error: Not enough operands for operator " + token);
             int right, left;
-            right = parse_int(_stack.top());
-            _stack.pop();
-            left = parse_int(_stack.top());
-            _stack.pop();
+            right = _operands.top();
+            _operands.pop();
+            left = _operands.top();
+            _operands.pop();
             int result = apply_operator(left, right, token);
-            _stack.push(std::to_string(result));
+            _operands.push(result);
         }
         else {
-            parse_int(token); // Validate integer
-            _stack.push(token);
+            _operands.push(parse_int(token));
         }
     }
-    if (_stack.size() != 1) {
-        throw std::runtime_error("Error: Invalid RPN expression");
+    if (_operands.size() != 1) {
+        throw std::runtime_error("Error: Invalid RPN expression, remaining operands: " + std::to_string(_operands.size()));
     }
-    return parse_int(_stack.top());
+    return _operands.top();
 }

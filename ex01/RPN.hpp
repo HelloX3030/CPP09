@@ -7,7 +7,8 @@
 class RPN
 {
     private:
-        std::stack<std::string>  _stack;
+        std::stack<std::string> _stack;
+        std::stack<int> _operands;
 
     public:
         // Canonical Form
