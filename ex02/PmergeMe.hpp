@@ -5,6 +5,7 @@
 #include <list>
 #include <stdexcept>
 #include <iostream>
+#include <set>
 
 class PmergeMe {
 private:

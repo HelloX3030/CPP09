@@ -46,8 +46,13 @@ PmergeMe::~PmergeMe() {}
 PmergeMe::PmergeMe(int argc, char **argv)
     : argc(argc), argv(argv)
 {
+    std::set<int> unique_values;
     for (int i = 1; i < argc; ++i) {
         int value = parse_int(std::string(argv[i]));
+        if (unique_values.find(value) != unique_values.end()) {
+            throw std::runtime_error("Error: Duplicate integer: " + std::to_string(value));
+        }
+        unique_values.insert(value);
         _vector.push_back(value);
         _list.push_back(value);
     }
@@ -62,14 +67,32 @@ void PmergeMe::displayData() const {
 }
 
 void PmergeMe::displaySorted() const {
-    for (std::vector<int>::const_iterator it = _vector.begin(); it != _vector.end(); ++it) {
-        std::cout << *it << " ";
+    for (size_t i = 0; i < _vector.size(); ++i) {
+        std::cout << _vector[i] << " ";
     }
     std::cout << std::endl;
 }
 
 void PmergeMe::sortVector() {
+    if ( _vector.size() <= 1 ) return;
+
+    // Get Leftover element if the size is odd
+    bool leftover = _vector.size() % 2;
+    int last_element;
+    if (leftover) {
+        last_element = _vector.back();
+        _vector.pop_back();
+    }
+
+    // Create pairs
     std::vector<std::pair<int, int> > pairs;
+    for (size_t i = 0; i < _vector.size(); i += 2) {
+        int a = std::min(_vector[i], _vector[i + 1]);
+        int b = std::max(_vector[i], _vector[i + 1]);
+        pairs.push_back(std::make_pair(a, b));
+    }
+
+    // Sort Pairs
 }
 
 void PmergeMe::sortList() {
