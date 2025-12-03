@@ -8,10 +8,10 @@
 
 class PmergeMe {
 private:
-    std::vector<int> _data_vector;
-    std::vector<int> _sorted_vector;
-    std::list<int> _data_list;
-    std::list<int> _sorted_list;
+    int argc;
+    char** argv;
+    std::vector<int> _vector;
+    std::list<int> _list;
 
 public:
     // Canonical Form
@@ -20,9 +20,12 @@ public:
     PmergeMe& operator=(const PmergeMe& other);
     ~PmergeMe();
 
+    // Special Constructor
+    PmergeMe(int argc, char **argv);
+
     // Functions
-    void sortVector(int argc, char** argv);
-    void sortList(int argc, char** argv);
+    void sortVector();
+    void sortList();
     void displayData() const;
     void displaySorted() const;
 };

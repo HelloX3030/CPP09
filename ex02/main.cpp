@@ -6,24 +6,24 @@ int main(int argc, char** argv)
 {
     try
     {
+        PmergeMe pm(argc, argv);
+
         // Vector version
         auto vector_start = std::chrono::high_resolution_clock::now();
-        PmergeMeVector pmVector(argc, argv);
-        pmVector.sortData();
+        pm.sortVector();
         auto vector_end = std::chrono::high_resolution_clock::now();
 
         // List version
         auto list_start =  std::chrono::high_resolution_clock::now();
-        PmergeMeList pmList(argc, argv);
-        pmList.sortData();
+        pm.sortList();
         auto list_end = std::chrono::high_resolution_clock::now();
 
         // Display results
         std::cout << "Before: ";
-        pmVector.displayData();
+        pm.displayData();
         std::cout << "After: ";
-        pmVector.displaySorted();
-        
+        pm.displaySorted();
+
         // Timing results
         std::cout << std::fixed << std::setprecision(6);
         std::cout << "Time to process a range of " << argc - 1 << " elements with std::vector : "
