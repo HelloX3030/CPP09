@@ -46,13 +46,8 @@ PmergeMe::~PmergeMe() {}
 PmergeMe::PmergeMe(int argc, char **argv)
     : argc(argc), argv(argv)
 {
-    std::set<int> unique_values;
     for (int i = 1; i < argc; ++i) {
         int value = parse_int(std::string(argv[i]));
-        if (unique_values.find(value) != unique_values.end()) {
-            throw std::runtime_error("Error: Duplicate integer: " + std::to_string(value));
-        }
-        unique_values.insert(value);
         _vector.push_back(value);
         _list.push_back(value);
     }
