@@ -63,7 +63,18 @@ void PmergeMe::displaySorted() const {
     std::cout << std::endl;
 }
 
-static void sort_vector(std::vector<int> &vec) {
+static void insert(std::vector<int> &vec, int value) {
+    int n = vec.size();
+    vec.push_back(0); // make space
+    int i = n - 1;
+    while (i >= 0 && vec[i] > value) {
+        vec[i + 1] = vec[i]; // shift right
+        i--;
+    }
+    vec[i + 1] = value;
+}
+
+static void sort(std::vector<int> &vec) {
     if ( vec.size() <= 1 ) return;
 
     // Get Leftover element if the size is odd
@@ -76,7 +87,7 @@ static void sort_vector(std::vector<int> &vec) {
     size_t pair_count = vec.size() / 2;
     std::vector<int> bigger;
     std::vector<int> smaller;
-    bigger.reserve(pair_count);
+    bigger.reserve(vec.size());
     smaller.reserve(pair_count);
     for (size_t i = 0; i < pair_count; ++i) {
         int first = vec[2 * i];
@@ -91,12 +102,16 @@ static void sort_vector(std::vector<int> &vec) {
     }
 
     // Recursively sort the bigger elements
-    sort_vector(bigger);
+    sort(bigger);
 
     // Insert smaller elements into the sorted bigger elements
-    std::vector<int> sorted;
-    sorted.reserve(vec.size());
-    
+    for (size_t i = 0; i < smaller.size(); ++i) {
+        insert(bigger, smaller[i]);
+    }
+    if (leftover) {
+        insert(bigger, *leftover);
+    }
+    vec = bigger;
 }
 
 void PmergeMe::sortVector() {
@@ -105,7 +120,7 @@ void PmergeMe::sortVector() {
         _vector.push_back(value);
     }
 
-    sort_vector(_vector);
+    sort(_vector);
 }
 
 void PmergeMe::sortList() {
