@@ -48,4 +48,13 @@ fclean: clean
 # Rebuild
 re: fclean all
 
-.PHONY: all clean fclean re
+test:
+	./$(NAME) $(shell shuf -i 1-1000 -n 100)
+
+test-subject:
+	./$(NAME) $(shell shuf -i 1-100000 -n 3000)
+
+test-large:
+	./$(NAME) $(shell shuf -i 1-1000000 -n 10000)
+
+.PHONY: all clean fclean re test test-subject test-large

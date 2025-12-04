@@ -60,8 +60,8 @@ void PmergeMe::cache_J_vector(size_t n) {
     while (true) {
         size_t k = _J_vector.size();
         // J(k) = J(k-1) + 2*J(k-2)
-        // => 2ULL to avoid overflow for large k
-        size_t next = _J_vector[k - 1] + 2ULL * _J_vector[k - 2];
+        // => 2ULL to avoid overflow for large k, by promoting to unsigned long long
+        unsigned long long next = _J_vector[k - 1] + 2ULL * _J_vector[k - 2];
         if (next > n) break;
         _J_vector.push_back(next);
     }
@@ -115,6 +115,23 @@ void PmergeMe::displaySorted() const {
     }
     std::cout << std::endl;
 }
+
+/*
+    Inserts elements from 'insert_values' into 'vec' following the
+    Jacobsthal order, which is used in Ford–Johnson merge-insertion
+    sorting.
+
+    The process works as follows:
+      1. Iterate through the cached Jacobsthal numbers (_J_vector),
+         which define the boundaries for insertion.
+      2. For each Jacobsthal number j, insert elements
+         from j-1 down to last.
+      3. Clamp j to the size of insert_values to avoid out-of-bounds
+         access.
+      4. Continue until all elements from insert_values are inserted.
+      5. Any leftover elements beyond the last Jacobsthal boundary
+         are inserted at the end.
+*/
 
 void PmergeMe::insert_in_jacobsthal_order(std::vector<int> &vec, const std::vector<int> &insert_values) {
     size_t n = insert_values.size();
