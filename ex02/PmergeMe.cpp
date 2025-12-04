@@ -16,7 +16,6 @@ static int parse_int(const std::string &token) {
     }
 }
 
-
 PmergeMe::PmergeMe()
     : argc(0), argv(nullptr)
 {
@@ -46,11 +45,7 @@ PmergeMe::~PmergeMe() {}
 PmergeMe::PmergeMe(int argc, char **argv)
     : argc(argc), argv(argv)
 {
-    for (int i = 1; i < argc; ++i) {
-        int value = parse_int(std::string(argv[i]));
-        _vector.push_back(value);
-        _list.push_back(value);
-    }
+
 }
 
 // Functions
@@ -68,26 +63,49 @@ void PmergeMe::displaySorted() const {
     std::cout << std::endl;
 }
 
-void PmergeMe::sortVector() {
-    if ( _vector.size() <= 1 ) return;
+static void sort_vector(std::vector<int> &vec) {
+    if ( vec.size() <= 1 ) return;
 
     // Get Leftover element if the size is odd
-    bool leftover = _vector.size() % 2;
-    int last_element;
-    if (leftover) {
-        last_element = _vector.back();
-        _vector.pop_back();
+    std::optional<int> leftover;
+    if (vec.size() % 2 != 0) {
+        leftover = vec.back();
     }
 
     // Create pairs
-    std::vector<std::pair<int, int> > pairs;
-    for (size_t i = 0; i < _vector.size(); i += 2) {
-        int a = std::min(_vector[i], _vector[i + 1]);
-        int b = std::max(_vector[i], _vector[i + 1]);
-        pairs.push_back(std::make_pair(a, b));
+    size_t pair_count = vec.size() / 2;
+    std::vector<int> bigger;
+    std::vector<int> smaller;
+    bigger.reserve(pair_count);
+    smaller.reserve(pair_count);
+    for (size_t i = 0; i < pair_count; ++i) {
+        int first = vec[2 * i];
+        int second = vec[2 * i + 1];
+        if (first > second) {
+            bigger.push_back(first);
+            smaller.push_back(second);
+        } else {
+            bigger.push_back(second);
+            smaller.push_back(first);
+        }
     }
 
-    // Sort Pairs
+    // Recursively sort the bigger elements
+    sort_vector(bigger);
+
+    // Insert smaller elements into the sorted bigger elements
+    std::vector<int> sorted;
+    sorted.reserve(vec.size());
+    
+}
+
+void PmergeMe::sortVector() {
+    for (int i = 1; i < argc; ++i) {
+        int value = parse_int(std::string(argv[i]));
+        _vector.push_back(value);
+    }
+
+    sort_vector(_vector);
 }
 
 void PmergeMe::sortList() {
