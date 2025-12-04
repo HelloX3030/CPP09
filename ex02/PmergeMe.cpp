@@ -59,6 +59,8 @@ void PmergeMe::cache_J_vector(size_t n) {
 
     while (true) {
         size_t k = _J_vector.size();
+        // J(k) = J(k-1) + 2*J(k-2)
+        // => 2ULL to avoid overflow for large k
         size_t next = _J_vector[k - 1] + 2ULL * _J_vector[k - 2];
         if (next > n) break;
         _J_vector.push_back(next);
@@ -121,15 +123,20 @@ void PmergeMe::insert_in_jacobsthal_order(std::vector<int> &vec, const std::vect
     // Insert in reverse chunks
     size_t last = 0;
     for (size_t idx = 0; idx < _J_vector.size(); ++idx) {
-        size_t j = _J_vector[idx]; // current Jacobsthal boundary
+        size_t j = _J_vector[idx];
 
-        // Insert smaller[j-1], smaller[j-2], ..., smaller[last]
-        // (reverse order)
+        // Ensure we do not exceed the insert_values size
+        if (j > n) j = n;
+
+        // Insert smaller[j-1], ..., smaller[last]
         for (size_t s = j; s > last; --s) {
             insert(vec, insert_values[s - 1]);
         }
 
         last = j;
+
+        // Stop if we have inserted all elements
+        if (last == n) break;
     }
 
     // If leftover smaller elements remain
