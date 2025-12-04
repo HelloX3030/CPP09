@@ -2,17 +2,26 @@
 
 #include <string>
 #include <vector>
-#include <list>
+#include <deque>
 #include <stdexcept>
 #include <iostream>
 #include <optional>
+#include <cmath>
 
 class PmergeMe {
 private:
     int argc;
     char** argv;
+
+    // vector
+    std::vector<int> _J_vector;
     std::vector<int> _vector;
-    std::list<int> _list;
+
+    // deque
+    std::deque<int> _J_deque;
+    std::deque<int> _deque;
+
+    void cache_jacobsthal_numbers(size_t n);
 
 public:
     // Canonical Form
@@ -26,7 +35,7 @@ public:
 
     // Functions
     void sortVector();
-    void sortList();
+    void sortDeque();
     void displayData() const;
     void displaySorted() const;
 };

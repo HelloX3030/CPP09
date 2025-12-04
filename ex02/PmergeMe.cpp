@@ -16,6 +16,56 @@ static int parse_int(const std::string &token) {
     }
 }
 
+static void insert(std::vector<int> &vec, int value) {
+    int n = vec.size();
+    vec.push_back(0); // make space
+    int i = n - 1;
+    while (i >= 0 && vec[i] > value) {
+        vec[i + 1] = vec[i]; // shift right
+        i--;
+    }
+    vec[i + 1] = value;
+}
+
+/*
+Jacobsthal numbers form a sequence defined by the recurrence:
+
+    J(0) = 0
+    J(1) = 1
+    J(n) = J(n − 1) + 2·J(n − 2)   for n ≥ 2
+
+The sequence begins: 0, 1, 1, 3, 5, 11, 21, 43, …
+
+They grow approximately like (2/3)·2^n. Each term is formed by
+adding the previous term and twice the term before that.
+*/
+
+void PmergeMe::cache_jacobsthal_numbers(size_t n) {
+    _J_vector.clear();
+
+    // Upper bound: number of Jacobsthal numbers <= n is O(log n).
+    if (n > 1) {
+        size_t ub = 2 + static_cast<size_t>(std::log2(n));
+        _J_vector.reserve(ub);
+    } else {
+        _J_vector.reserve(2);
+    }
+
+    if (n == 0) return;
+
+    _J_vector.push_back(1);
+    if (n == 1) return;
+
+    _J_vector.push_back(1);
+
+    while (true) {
+        size_t k = _J_vector.size();
+        size_t next = _J_vector[k - 1] + 2ULL * _J_vector[k - 2];
+        if (next > n) break;
+        _J_vector.push_back(next);
+    }
+}
+
 PmergeMe::PmergeMe()
     : argc(0), argv(nullptr)
 {
@@ -25,16 +75,18 @@ PmergeMe::PmergeMe()
 PmergeMe::PmergeMe(const PmergeMe& other) {
     argc = other.argc;
     argv = other.argv;
+    _J_vector = other._J_vector;
     _vector = other._vector;
-    _list = other._list;
+    _deque = other._deque;
 }
 
 PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
     if (this != &other) {
         argc = other.argc;
         argv = other.argv;
+        _J_vector = other._J_vector;
         _vector = other._vector;
-        _list = other._list;
+        _deque = other._deque;
     }
     return *this;
 }
@@ -63,15 +115,38 @@ void PmergeMe::displaySorted() const {
     std::cout << std::endl;
 }
 
-static void insert(std::vector<int> &vec, int value) {
-    int n = vec.size();
-    vec.push_back(0); // make space
-    int i = n - 1;
-    while (i >= 0 && vec[i] > value) {
-        vec[i + 1] = vec[i]; // shift right
-        i--;
+static void insert_in_jacobsthal_order(std::vector<int> &bigger, const std::vector<int> &smaller) {
+    size_t n = smaller.size();
+    if (n == 0) return;
+
+    // Generate all Jacobsthal numbers <= n
+    std::vector<size_t> J;
+    for (size_t k = 1;; ++k) {
+        size_t j = jacobsthal(k);
+        if (j > n) break;
+        // Skip duplicates: J(1)=1, J(2)=1
+        if (J.empty() || J.back() != j)
+            J.push_back(j);
     }
-    vec[i + 1] = value;
+
+    // Insert in reverse chunks
+    size_t last = 0;
+    for (size_t idx = 0; idx < J.size(); ++idx) {
+        size_t j = J[idx]; // current Jacobsthal boundary
+
+        // Insert smaller[j-1], smaller[j-2], ..., smaller[last]
+        // (reverse order)
+        for (size_t s = j; s > last; --s) {
+            insert(bigger, smaller[s - 1]);
+        }
+
+        last = j;
+    }
+
+    // If leftover smaller elements remain
+    for (size_t s = n; s > last; --s) {
+        insert(bigger, smaller[s - 1]);
+    }
 }
 
 static void sort(std::vector<int> &vec) {
@@ -101,13 +176,9 @@ static void sort(std::vector<int> &vec) {
         }
     }
 
-    // Recursively sort the bigger elements
     sort(bigger);
+    insert_in_jacobsthal_order(bigger, smaller);
 
-    // Insert smaller elements into the sorted bigger elements
-    for (size_t i = 0; i < smaller.size(); ++i) {
-        insert(bigger, smaller[i]);
-    }
     if (leftover) {
         insert(bigger, *leftover);
     }
@@ -123,6 +194,5 @@ void PmergeMe::sortVector() {
     sort(_vector);
 }
 
-void PmergeMe::sortList() {
-    std::list<std::pair<int, int> > pairs;
+void PmergeMe::sortDeque() {
 }

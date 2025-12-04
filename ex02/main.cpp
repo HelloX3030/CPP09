@@ -14,9 +14,9 @@ int main(int argc, char** argv)
         auto vector_end = std::chrono::high_resolution_clock::now();
 
         // List version
-        auto list_start =  std::chrono::high_resolution_clock::now();
-        pm.sortList();
-        auto list_end = std::chrono::high_resolution_clock::now();
+        auto deque_start =  std::chrono::high_resolution_clock::now();
+        pm.sortDeque();
+        auto deque_end = std::chrono::high_resolution_clock::now();
 
         // Display results
         std::cout << "Before: ";
@@ -29,8 +29,8 @@ int main(int argc, char** argv)
         std::cout << "Time to process a range of " << argc - 1 << " elements with std::vector : "
                   << std::chrono::duration_cast<std::chrono::microseconds>(vector_end - vector_start).count()
                   << " us" << std::endl;
-        std::cout << "Time to process a range of " << argc - 1 << " elements with std::list : "
-                  << std::chrono::duration_cast<std::chrono::microseconds>(list_end - list_start).count()
+        std::cout << "Time to process a range of " << argc - 1 << " elements with std::deque : "
+                  << std::chrono::duration_cast<std::chrono::microseconds>(deque_end - deque_start).count()
                   << " us" << std::endl;
     }
     catch(const std::exception& e)
