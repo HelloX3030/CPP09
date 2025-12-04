@@ -21,7 +21,9 @@ private:
     std::deque<int> _J_deque;
     std::deque<int> _deque;
 
-    void cache_jacobsthal_numbers(size_t n);
+    void cache_J_vector(size_t n);
+    void insert_in_jacobsthal_order(std::vector<int> &vec, const std::vector<int> &insert_values);
+    void sort(std::vector<int> &vec);
 
 public:
     // Canonical Form

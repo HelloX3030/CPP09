@@ -39,8 +39,7 @@ The sequence begins: 0, 1, 1, 3, 5, 11, 21, 43, …
 They grow approximately like (2/3)·2^n. Each term is formed by
 adding the previous term and twice the term before that.
 */
-
-void PmergeMe::cache_jacobsthal_numbers(size_t n) {
+void PmergeMe::cache_J_vector(size_t n) {
     _J_vector.clear();
 
     // Upper bound: number of Jacobsthal numbers <= n is O(log n).
@@ -115,29 +114,19 @@ void PmergeMe::displaySorted() const {
     std::cout << std::endl;
 }
 
-static void insert_in_jacobsthal_order(std::vector<int> &bigger, const std::vector<int> &smaller) {
-    size_t n = smaller.size();
+void PmergeMe::insert_in_jacobsthal_order(std::vector<int> &vec, const std::vector<int> &insert_values) {
+    size_t n = insert_values.size();
     if (n == 0) return;
-
-    // Generate all Jacobsthal numbers <= n
-    std::vector<size_t> J;
-    for (size_t k = 1;; ++k) {
-        size_t j = jacobsthal(k);
-        if (j > n) break;
-        // Skip duplicates: J(1)=1, J(2)=1
-        if (J.empty() || J.back() != j)
-            J.push_back(j);
-    }
 
     // Insert in reverse chunks
     size_t last = 0;
-    for (size_t idx = 0; idx < J.size(); ++idx) {
-        size_t j = J[idx]; // current Jacobsthal boundary
+    for (size_t idx = 0; idx < _J_vector.size(); ++idx) {
+        size_t j = _J_vector[idx]; // current Jacobsthal boundary
 
         // Insert smaller[j-1], smaller[j-2], ..., smaller[last]
         // (reverse order)
         for (size_t s = j; s > last; --s) {
-            insert(bigger, smaller[s - 1]);
+            insert(vec, insert_values[s - 1]);
         }
 
         last = j;
@@ -145,11 +134,11 @@ static void insert_in_jacobsthal_order(std::vector<int> &bigger, const std::vect
 
     // If leftover smaller elements remain
     for (size_t s = n; s > last; --s) {
-        insert(bigger, smaller[s - 1]);
+        insert(vec, insert_values[s - 1]);
     }
 }
 
-static void sort(std::vector<int> &vec) {
+void PmergeMe::sort(std::vector<int> &vec) {
     if ( vec.size() <= 1 ) return;
 
     // Get Leftover element if the size is odd
