@@ -49,7 +49,7 @@ fclean: clean
 re: fclean all
 
 test:
-	./$(NAME) $(shell shuf -i 1-1000 -n 100)
+	./$(NAME) $(shell shuf -i 1-100 -n 10)
 
 test-subject:
 	./$(NAME) $(shell shuf -i 1-100000 -n 3000)
