@@ -43,4 +43,5 @@ public:
     void sortDeque();
     void displayData() const;
     void displaySorted() const;
+    void verifySorted() const;
 };

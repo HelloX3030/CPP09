@@ -143,6 +143,13 @@ void PmergeMe::displayData() const {
 }
 
 void PmergeMe::displaySorted() const {
+    for (size_t i = 0; i < _vector.size(); ++i) {
+        std::cout << _vector[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+void PmergeMe::verifySorted() const {
     if (_vector.size() != _deque.size()) {
         throw std::runtime_error("Error: Vector and Deque sizes differ.");
     }
@@ -150,7 +157,6 @@ void PmergeMe::displaySorted() const {
         throw std::runtime_error("Error: Sorted size does not match input size.");
     }
     for (size_t i = 0; i < _vector.size(); ++i) {
-        std::cout << _vector[i] << " ";
         if (_vector[i] != _deque[i]) {
             throw std::runtime_error("Error: Vector and Deque sorted results differ.");
         }
@@ -158,7 +164,6 @@ void PmergeMe::displaySorted() const {
             throw std::runtime_error("Error: Vector is not sorted correctly.");
         }
     }
-    std::cout << std::endl;
 }
 
 /*

@@ -32,6 +32,7 @@ int main(int argc, char** argv)
         std::cout << "Time to process a range of " << argc - 1 << " elements with std::deque : "
                   << std::chrono::duration_cast<std::chrono::microseconds>(deque_end - deque_start).count()
                   << " us" << std::endl;
+        pm.verifySorted();
     }
     catch(const std::exception& e)
     {
