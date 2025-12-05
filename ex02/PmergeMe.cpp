@@ -27,6 +27,17 @@ static void insert(std::vector<int> &vec, int value) {
     vec[i + 1] = value;
 }
 
+static void insert(std::deque<int> &deq, int value) {
+    int n = deq.size();
+    deq.push_back(0); // make space
+    int i = n - 1;
+    while (i >= 0 && deq[i] > value) {
+        deq[i + 1] = deq[i]; // shift right
+        i--;
+    }
+    deq[i + 1] = value;
+}
+
 /*
 Jacobsthal numbers form a sequence defined by the recurrence:
 
@@ -67,6 +78,26 @@ void PmergeMe::cache_J_vector(size_t n) {
     }
 }
 
+void PmergeMe::cache_J_deque(size_t n) {
+    _J_deque.clear();
+
+    if (n == 0) return;
+
+    _J_deque.push_back(1);
+    if (n == 1) return;
+
+    _J_deque.push_back(1);
+
+    while (true) {
+        size_t k = _J_deque.size();
+        // J(k) = J(k-1) + 2*J(k-2)
+        // => 2ULL to avoid overflow for large k, by promoting to unsigned long long
+        unsigned long long next = _J_deque[k - 1] + 2ULL * _J_deque[k - 2];
+        if (next > n) break;
+        _J_deque.push_back(next);
+    }
+}
+
 PmergeMe::PmergeMe()
     : argc(0), argv(nullptr)
 {
@@ -77,6 +108,7 @@ PmergeMe::PmergeMe(const PmergeMe& other) {
     argc = other.argc;
     argv = other.argv;
     _J_vector = other._J_vector;
+    _J_deque = other._J_deque;
     _vector = other._vector;
     _deque = other._deque;
 }
@@ -86,6 +118,7 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
         argc = other.argc;
         argv = other.argv;
         _J_vector = other._J_vector;
+        _J_deque = other._J_deque;
         _vector = other._vector;
         _deque = other._deque;
     }
@@ -112,6 +145,9 @@ void PmergeMe::displayData() const {
 void PmergeMe::displaySorted() const {
     for (size_t i = 0; i < _vector.size(); ++i) {
         std::cout << _vector[i] << " ";
+        if (_vector[i] != _deque[i]) {
+            throw std::runtime_error("Error: Vector and Deque sorted results differ.");
+        }
     }
     std::cout << std::endl;
 }
@@ -162,6 +198,35 @@ void PmergeMe::insert_in_jacobsthal_order(std::vector<int> &vec, const std::vect
     }
 }
 
+void PmergeMe::insert_in_jacobsthal_order(std::deque<int> &deq, const std::deque<int> &insert_values) {
+    size_t n = insert_values.size();
+    if (n == 0) return;
+
+    // Insert in reverse chunks
+    size_t last = 0;
+    for (size_t idx = 0; idx < _J_deque.size(); ++idx) {
+        size_t j = _J_vector[idx];
+
+        // Ensure we do not exceed the insert_values size
+        if (j > n) j = n;
+
+        // Insert smaller[j-1], ..., smaller[last]
+        for (size_t s = j; s > last; --s) {
+            insert(deq, insert_values[s - 1]);
+        }
+
+        last = j;
+
+        // Stop if we have inserted all elements
+        if (last == n) break;
+    }
+
+    // If leftover smaller elements remain
+    for (size_t s = n; s > last; --s) {
+        insert(deq, insert_values[s - 1]);
+    }
+}
+
 void PmergeMe::sort(std::vector<int> &vec) {
     if ( vec.size() <= 1 ) return;
 
@@ -198,7 +263,42 @@ void PmergeMe::sort(std::vector<int> &vec) {
     vec = bigger;
 }
 
+void PmergeMe::sort(std::deque<int> &deq) {
+    if ( deq.size() <= 1 ) return;
+
+    // Get Leftover element if the size is odd
+    std::optional<int> leftover;
+    if (deq.size() % 2 != 0) {
+        leftover = deq.back();
+    }
+
+    // Create pairs
+    size_t pair_count = deq.size() / 2;
+    std::deque<int> bigger;
+    std::deque<int> smaller;
+    for (size_t i = 0; i < pair_count; ++i) {
+        int first = deq[2 * i];
+        int second = deq[2 * i + 1];
+        if (first > second) {
+            bigger.push_back(first);
+            smaller.push_back(second);
+        } else {
+            bigger.push_back(second);
+            smaller.push_back(first);
+        }
+    }
+
+    sort(bigger);
+    insert_in_jacobsthal_order(bigger, smaller);
+
+    if (leftover) {
+        insert(bigger, *leftover);
+    }
+    deq = bigger;
+}
+
 void PmergeMe::sortVector() {
+    _vector.reserve(argc - 1);
     for (int i = 1; i < argc; ++i) {
         int value = parse_int(std::string(argv[i]));
         _vector.push_back(value);
@@ -208,4 +308,10 @@ void PmergeMe::sortVector() {
 }
 
 void PmergeMe::sortDeque() {
+    for (int i = 1; i < argc; ++i) {
+        int value = parse_int(std::string(argv[i]));
+        _deque.push_back(value);
+    }
+
+    sort(_deque);
 }
